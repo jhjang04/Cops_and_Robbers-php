@@ -15,7 +15,7 @@ class service{
 			$this->m_dao = new mysqlDao($connector);
 		}
 		
-		$this->logger = logger::getLogger();
+		$this->logger = SimpleLogger::getLogger();
 	}
 
 	public function __destruct(){
