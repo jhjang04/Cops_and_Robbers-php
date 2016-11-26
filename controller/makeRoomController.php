@@ -3,7 +3,7 @@
 	$nick = $_GET['nick'];
 	
 	if(!isset($pwd) || !isset($$nick)){
-		//..exception
+		throw new Exception("no password or nick");
 	}
 	
 	$room_id = serviceCall("makeRoom" , $pwd , $nick);

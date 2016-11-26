@@ -11,9 +11,16 @@ class mysqlDao {
 		$this->connector = $connector;
 	}
 	
-	public function example(){
+	
+	//example source
+	public function getExampleResult($pr1 , $pr2){
 		$sql = "select * from room_mst where ? = ? ;";
-		$rs = $this->connector->exquteQuery($sql , "ss" , ["1","1"]);
+		//? is parameter 
+		// search prepared statement
+		$rs = $this->connector->excuteQuery($sql , "ss" , [$pr1,$pr2]);
+		//"ss" is paremeter type string string.
+		//if parameters are integer and string then
+		//call excuteQuery($sql , "sd" , [$pr1,$pre])
 		return $rs;
 	}
 	
@@ -22,12 +29,11 @@ class mysqlDao {
 		$sql = "select 1 from room_mst where room_id = ?";
 		do{
 			$rand = mt_rand(1,9999);
-			$rs = $connector->excuteQuery($sql , "d" , $rand);
+			$rs = $this->connector->excuteQuery($sql , "d" , $rand);
 		}
 		while(count($rs) != 0 );
 		return $rand;
 	}
-	
 	
 	public function makeRoom($pwd , $nick){
 		$sql = "CALL P_MAKE_ROOM( ? );";

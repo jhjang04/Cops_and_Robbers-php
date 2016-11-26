@@ -21,6 +21,14 @@ class service{
 	public function __destruct(){
 	}
 	
+	///////////////////service functioin /////////////////////
+	
+	
+	public function example($pr1 , $pr2){
+		return $this->m_dao->getExampleResult($pr1 , $pr2 );
+	}
+	
+	
 	
 	public function makeRoom($pwd , $nick){
 		return $this->m_dao->makeRoom($pwd , $nick );
@@ -43,9 +51,12 @@ class service{
 function serviceCall(){
 	$args = func_get_args();
 	global $G_SERVICE;
+	global $G_DBCONNECTOR;
 	if(count($args) < 1){
-		throw new Exception("no service Names");
+		throw new Exception("no service name");
 	}
+	$logger = SimpleLogger::getLogger();
+	
 	$rtn;
 	$strCallService = "\$rtn = \$G_SERVICE->".$args[0]."(";
 	for($i=1 ; $i<count($args) ; $i++ ){
@@ -56,6 +67,7 @@ function serviceCall(){
 	$strCallService.= ");";
 	try{
 		eval ($strCallService);
+		$G_DBCONNECTOR->release("COMMIT");
 		return $rtn;
 	}
 	catch (Exception $e){

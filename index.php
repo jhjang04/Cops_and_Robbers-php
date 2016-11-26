@@ -1,4 +1,7 @@
 <?php
+
+//example..
+//http://YOUR_DOMAIN/index.php?src=example
 try{
 	require "header/header.php";
 	
