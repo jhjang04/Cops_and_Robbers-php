@@ -14,7 +14,7 @@ class mysqlDao {
 	
 	//example source
 	public function getExampleResult($pr1 , $pr2){
-		$sql = "select * from room_mst where ? = ? ;";
+		$sql = "select * from room where ? = ? ;";
 		//? is parameter 
 		// search prepared statement
 		$rs = $this->connector->excuteQuery($sql , "ss" , [$pr1,$pr2]);
@@ -26,7 +26,7 @@ class mysqlDao {
 	
 	
 	public function getNewRoomId(){
-		$sql = "select 1 from room_mst where room_id = ?";
+		$sql = "select 1 from room where room_id = ?";
 		do{
 			$rand = mt_rand(1,9999);
 			$rs = $this->connector->excuteQuery($sql , "d" , $rand);
@@ -36,8 +36,8 @@ class mysqlDao {
 	}
 	
 	public function makeRoom($pwd , $nick){
-		$sql = "CALL P_MAKE_ROOM( ? );";
-		$rs = $this->connector->excuteQuery($sql , "s" , [$pwd]);
+		$sql = "CALL P_MAKE_ROOM( ? , ? );";
+		$rs = $this->connector->excuteQuery($sql , "ss" , [$pwd , $nick]);
 		return $rs[0]['ROOM_ID'];
 	}
 	

@@ -10,7 +10,9 @@ try{
 		include "controller/".$src."Controller.php";
 }
 catch(Exception $e){
-	echo $e;
+	$err = array();
+	$err['msg'] = $e;
+	echo json_encode($err);
 }
 finally {
 
