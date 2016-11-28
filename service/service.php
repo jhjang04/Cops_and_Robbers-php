@@ -71,6 +71,7 @@ function serviceCall(){
 		return $rtn;
 	}
 	catch (Exception $e){
+		$G_DBCONNECTOR->release("ROLLBACK");
 		throw $e;
 	}
 }
