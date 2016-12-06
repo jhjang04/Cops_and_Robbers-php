@@ -11,7 +11,7 @@ try{
 }
 catch(Exception $e){
 	$err = array();
-	$err['errmsg'] = $e;
+	$err['errmsg'] = $e->__toString();
 	echo json_encode($err);
 }
 finally {
