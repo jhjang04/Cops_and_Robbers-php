@@ -54,6 +54,7 @@ class mysqlConnector {
 	{
 		if(!isset($types)){ $types = "";}
 		if(!isset($params)){ $params = array();}
+		if(!is_array($params)){ $params = [$params]; }
 		
 		$conn = $this->getConnection();
 		$stmt = mysqli_prepare($conn, $sql);
