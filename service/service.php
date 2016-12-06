@@ -30,12 +30,25 @@ class service{
 	
 	
 	
-	public function makeRoom($pwd , $nick){
-		return $this->m_dao->makeRoom($pwd , $nick );
+	public function makeRoom($pwd , $nickname){
+		$room_id = $this->m_dao->getNewRoomId();
+		$team = $this->m_dao->getNewTeam($room_id);
+		$this->m_dao->insertRoom($room_id , $pwd);
+		$this->m_dao->insertUser($room_id, 1, $nickname, $team);
+		
+		$rs = array();
+		$rs['result'] = 'PASS';
+		$rs['room_id'] = $room_id;
+		$rs['user_no'] = 1;
+		$rs['team'] = $team;
+		
+		return $rs;
 	}
 	
-	public function joinRoom($pwd , $nick){
-		
+	public function joinRoom($room_id , $pwd , $nick){
+		$team = $this->m_dao->getNewTeam($room_id);
+		$this->m_dao->makeRoom($id , $pwd);
+		$this->m_dao->insertUser($room_id, 1, $nickname, $team);
 	}
 	
 	public function exitRoom($room_id , $user_id){
@@ -46,6 +59,11 @@ class service{
 	
 	//public function atPlaying();
 }
+
+
+
+
+
 
 
 function serviceCall(){

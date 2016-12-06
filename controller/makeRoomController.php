@@ -1,17 +1,14 @@
 <?php
 	$pwd = $_GET['pwd'];
-	$nick = $_GET['nick'];
+	$nickname = $_GET['nickname'];
 	
-	if(!isset($pwd) || !isset($nick)){
+	if(!isset($pwd) || !isset($nickname)){
 		throw new Exception("no password or nick");
 	}
 	
-	$room_id = serviceCall("makeRoom" , $pwd , $nick);
+	$rs = serviceCall("makeRoom" , $pwd , $nickname);
 	
-	$res = array();
-	$res['room_id'] = $room_id;
-	$res['user_no'] = 1;
-	echo json_encode($res);
+	echo json_encode($rs);
 ?>
 
 
