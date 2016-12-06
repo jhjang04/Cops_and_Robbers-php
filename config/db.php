@@ -17,8 +17,8 @@
 // */
 $db_info = array();
 $db_info['type'] = "mysql";
-$db_info['host'] = "127.0.0.1";
-$db_info['port'] = "3306";
+$db_info['host'] = "163.180.173.169";
+$db_info['port'] = "9998";
 $db_info['user_nm'] = "car_user";
 $db_info['pwd'] = "1234";
 $db_info['db_name'] = "car";
