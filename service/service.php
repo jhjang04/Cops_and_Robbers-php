@@ -87,6 +87,31 @@ class service{
 		return $rs;
 	}
 	
+	public function playing($room_id, $user_no, $team, $latitude, $longitude, $state, $lastChatIdx, $lastTeamChatIdx){
+		$rs = array();
+		
+		// update гр ╟м
+		$update_location = $this->m_dao->updateLocation($room_id, $user_no, $latitude, $longitude);
+		$update_state = $this->m_dao->updateState($room_id, $user_no, $state);
+		
+		// response
+		$user_list = $this->m_dao->getUserList($room_id);
+		$chat_list = $this->m_dao->getChatList($room_id, $lastChatIdx);
+		$teamchat_list = $this->m_dao->getTeamChatList($room_id, $team, $lastTeamChatIdx);
+		$lastIdx = $this->m_dao->getLastChatIdx($room_id, $lastChatIdx);
+		$lastTeamIdx = $this->m_dao->getLastTeamChatList($room_id,$team,$lastTeamChatIdx);
+		
+
+		$rs['result'] = "ING";
+		$rs['userList'] = $user_list;
+		$rs['chatList'] = $chat_list;
+		$rs['teamChatList'] = $teamchat_list;
+		$rs['lastChatIdx'] = $lastIdx;
+		$rs['lastTeamChatIdx'] = $lastTeamIdx;
+		$rs['remain_time'] = "";
+		return $rs;
+	}
+	
 	public function exitRoom($room_id , $user_id){
 		
 	}

@@ -143,6 +143,56 @@ class mysqlDao {
 		
 		return 1;
 	}
+	
+	// 마지막 인덱스 후의 전체 채팅 리스트
+	public function getChatList($room_id, $lastChatIdx){
+		$sql = "select room_id, team, chat_flag, idx, user_no, nickname, wr_time, text from chat
+				where room_id = ? and chat_flag = 3 and idx > ?";
+		$rs = $this->connector->excuteQuery($sql , "ii" , [$room_id, $lastChatIdx]);
+		
+		return $rs;
+	}
+	
+	// 팀채팅을 받아올 때
+	public function getTeamChatList($room_id, $team, $lastTeamChatIdx){
+		$sql = "select room_id, team, chat_flag, idx, user_no, nickname, wr_time, text from chat
+				where room_id = ? and chat_flag = ? and idx > ?";
+		$rs = $this->connector->excuteQuery($sql , "iii" , [$room_id, $team, $lastChatIdx]);
+	
+		return $rs;
+	}
+	
+	// 마지막 전채채팅 인덱스를 받아오는 함수.
+	public function getLastChatIdx($room_id, $lastChatIdx){
+		$sql = "select max(idx) from chat where room_id= ? and chat_flag =3 and idx > ?";
+		$rs = $this->connector->excuteQuery($sql, "ii", [$room_id, $lastChatIdx]);
+		
+		return $rs;
+	}
+	
+	// 마지막 팀채팅 인덱스를 받아오는 함수.
+	public function getLastTeamChatIdx($room_id,$team,$lastTeamChatIdx){
+		$sql = "select max(idx) from chat where room_id= ? and chat_flag = ? and idx > ?";
+		$rs = $this->connector->excuteQuery($sql, "iii", [$room_id, $team, $lastTeamChatIdx]);
+		
+		return $rs;
+	}
+	
+	public function updateLocation($room_id, $user_no, $latitude, $longitude){
+		$sql = "update user set latitude = ?, longitude = ? , last_access = sysdate()
+				where room_id = ? and user_no = ?";
+		$rs = $this->connector->excuteQuery($sql , "ddii" , [$latitude,$longitude,$room_id, $user_no]);
+		
+		return 1;
+	}
+	
+	public function updateState($room_id, $user_no, $state){
+		$sql = "update user set state = ? , last_access = sysdate(),
+				where room_id = ? and user_no = ?";
+		$rs = $this->connector->excuteQuery($sql , "iii" , [$state, $room_id, $user_no]);
+	
+		return 1;
+	}
 }
 ?>
 
