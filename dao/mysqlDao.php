@@ -193,6 +193,20 @@ class mysqlDao {
 	
 		return 1;
 	}
+	
+	// 채팅을 마지막 idx로 찾아서 넣음.
+	public function insertChat($room_id, $team, $chat_flag, $user_no, $nickname, $text){
+		$sql = "select max(idx) from chat where room_id = ? and chat_flag = ?";
+		$maxIdx = $this->connector->excuteQuery($sql, "ii", [$room_id, $chat_flag]);
+		
+		$sql = "insert into chat(room_id, team, chat_flag, idx, user_no, nickname, wr_time, text)
+				values( ?, ?, ?, ?, ?, ?, sysdate(), ?)";
+		
+		$rs = $this->connector->excuteQuery($sql, "iiiiiss",[$room_id, $team, $chat_flag, $maxIdx,
+				$user_no, $nickname, $text]);
+		
+		return $rs;
+	}
 }
 ?>
 

@@ -100,7 +100,6 @@ class service{
 		$teamchat_list = $this->m_dao->getTeamChatList($room_id, $team, $lastTeamChatIdx);
 		$lastIdx = $this->m_dao->getLastChatIdx($room_id, $lastChatIdx);
 		$lastTeamIdx = $this->m_dao->getLastTeamChatList($room_id,$team,$lastTeamChatIdx);
-		
 
 		$rs['result'] = "ING";
 		$rs['userList'] = $user_list;
@@ -109,6 +108,28 @@ class service{
 		$rs['lastChatIdx'] = $lastIdx;
 		$rs['lastTeamChatIdx'] = $lastTeamIdx;
 		$rs['remain_time'] = "";
+		return $rs;
+	}
+	
+	public function sendChat($room_id , $team, $chat_flag, $user_no, $nickname, $text
+			, $lastChatIdx, $lastTeamChatIdx){
+		
+		$rs = array();
+		
+		// insert гр ╟м
+		$this->m_dao->insertChat($room_id, $team, $chat_flag, $user_no, $nickname, $text);
+		
+		// response
+		$lastIdx = $this->m_dao->getLastChatIdx($room_id, $lastChatIdx);
+		$lastTeamIdx = $this->m_dao->getLastTeamChatList($room_id,$team,$lastTeamChatIdx);
+		$chat_list = $this->m_dao->getChatList($room_id, $lastChatIdx);
+		$teamchat_list = $this->m_dao->getTeamChatList($room_id, $team, $lastTeamChatIdx);
+		
+		$rs['lastChatIdx'] = $lastIdx;
+		$rs['lastTeamChatIdx'] = $lastTeamIdx;
+		$rs['chatList'] = $chat_list;
+		$rs['teamChatList'] = $teamchat_list;
+		
 		return $rs;
 	}
 	
