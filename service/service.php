@@ -45,10 +45,18 @@ class service{
 		return $rs;
 	}
 	
-	public function joinRoom($room_id , $pwd , $nick){
+	// 방에 참가
+	public function joinRoom($room_id , $pwd , $nickname){
+		// 새로운 팀을 받아 옴.
 		$team = $this->m_dao->getNewTeam($room_id);
-		$this->m_dao->makeRoom($id , $pwd);
 		$this->m_dao->insertUser($room_id, 1, $nickname, $team);
+		
+		$rs = array();
+		$rs['result'] = 'PASS';
+		$rs['room_id'] = $room_id;
+		$rs['team'] = $team;
+		
+		return $rs;
 	}
 	
 	public function exitRoom($room_id , $user_id){
