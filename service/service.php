@@ -47,13 +47,24 @@ class service{
 	
 	// 방에 참가
 	public function joinRoom($room_id , $pwd , $nickname){
+		$rs = array();
+		// 방의 존재 여부 검사.
+		$room_exist = $this->m_dao->isExistRoom($room_id);
+		
+		//방이 존재하지 않으면
+		if(!$room_exist){
+			$rs['result'] = 'FAIL';
+			return $rs;
+		}
+		
 		// 새로운 팀을 받아 옴.
 		$team = $this->m_dao->getNewTeam($room_id);
 		$this->m_dao->insertUser($room_id, 1, $nickname, $team);
+		$user_no = $this->m_dao->getNewUserNo($room_id);		
 		
-		$rs = array();
 		$rs['result'] = 'PASS';
 		$rs['room_id'] = $room_id;
+		$rs['user_no'] = $user_no;
 		$rs['team'] = $team;
 		
 		return $rs;

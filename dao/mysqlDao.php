@@ -52,6 +52,13 @@ class mysqlDao {
 		return $rs;
 	}
 	
+	public function isExistRoom($room_id){
+		$sql = "select * from room where room_id = ?";
+		$rs = $this->connector->excuteQuery($sql, "i", [$room_id]);
+		
+		return count($rs);
+	}
+	
 	public function getNewTeam($room_id){
 		$sql = "select sum(case when team = 1 then 1 else 0 end)  cop_cnt
 					, sum(case when team = 2 then 1 else 0 end)  robber_cnt
