@@ -70,6 +70,23 @@ class service{
 		return $rs;
 	}
 	
+	public function selectTeam($room_id , $user_no , $team, $ready_status){
+		$rs = array();
+		
+		// 선택한 팀과 레디 상태를 업데이트 함.
+		$updaters = $this->m_dao->updateTeam($room_id, $user_no, $team);
+		$updaters2 = $this->m_dao->updateReadyState($room_id, $user_no,$ready_status);
+
+		// 방의 진행 상태와 방에있는 유저의 리스트를 반환 함.
+		$isStart = $this->m_dao->getRoomState($room_id);
+		$user_list = $this->m_dao->getUserList($room_id);
+
+		$rs['result'] = $isStart;
+		$rs['userList']= $user_list;
+		
+		return $rs;
+	}
+	
 	public function exitRoom($room_id , $user_id){
 		
 	}

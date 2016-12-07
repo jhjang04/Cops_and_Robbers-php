@@ -28,7 +28,7 @@ class mysqlDao {
 		return $rs;
 	}
 	
-	
+	// 새로운 방 번호 부여
 	public function getNewRoomId(){
 		$sql = "select 1 from room where room_id = ?";
 		do{
@@ -52,6 +52,7 @@ class mysqlDao {
 		return $rs;
 	}
 	
+	// 방 존재여부 검사 return false or true
 	public function isExistRoom($room_id){
 		$sql = "select * from room where room_id = ?";
 		$rs = $this->connector->excuteQuery($sql, "i", [$room_id]);
@@ -59,6 +60,7 @@ class mysqlDao {
 		return count($rs);
 	}
 	
+	// 새로운 user에게 틈 번호를 부여 함.(더 적은 팀으로 자동 배치)
 	public function getNewTeam($room_id){
 		$sql = "select sum(case when team = 1 then 1 else 0 end)  cop_cnt
 					, sum(case when team = 2 then 1 else 0 end)  robber_cnt
@@ -80,22 +82,86 @@ class mysqlDao {
 		return $team;
 	}
 	
+	// 그 방의 새로운 user_no을 부여 함.
 	public function getNewUserNo($room_id){
 		$sql = "select ifnull(max(user_no) , 0) + 1 as user_no from user where room_id = ?";
 		$rs = $this->connector->excuteQuery($sql , "i" , [$room_id]);
+		print_r($rs);
 		return $rs[0]['user_no'];
 	}
 	
-	
+	// 방에 유저를 넣음(추가)
 	public function insertUser($room_id , $user_no , $nickname , $team){
-		$sql = "insert into user(room_id , user_no , nickname , team , state , team_select_time , last_access)
-				values( ? , ? , ? , ? , 1 , sysdate() , sysdate());";
+		$sql = "insert into user(room_id , user_no , nickname , team , state , team_select_time , ready_status , last_access)
+				values( ? , ? , ? , ? , 1 , sysdate() , 2, sysdate());";
 		
+		// ready status 는 기본적으로 2(not ready) 상태
 		$rs = $this->connector->excuteQuery($sql , "iisi" , [$room_id , $user_no , $nickname , $team]);
 		return $rs;
 	}
 	
+	// 방의 상태 체크
+	public function getRoomState($room_id){
+		
+		$sql = "select ready_status from user where room_id= ? and user_no = 1";
+		$rs = $this->connector->excuteQuery($sql , "i" , [$room_id]);
+		
+		$value= $rs[0]['ready_status'];
+		
+		if($value==2){
+			$state = "WAIT";
+		}
+		else if($value==1){
+			$state = "START";
+		}
+		
+		return $state;
+	}
 	
+	// 해당 room_id에 속한 유저들의 리스트를 반환
+	public function getUserList($room_id){
+		$sql = "select user_no, nickname, team, state, latitude, longitude
+				team_select_time, ready_status, last_access from user 
+				where room_id = ?";
+		$rs = $this->connector->excuteQuery($sql , "i" , [$room_id]);
+		
+		return $rs;
+	}
 	
+	// team 번호를 받아 team을 변경해 줌.
+	public function updateTeam($room_id, $user_no, $team){
+		$sql = "update user set team = ? where room_id = ? and user_no = ?";
+		$rs = $this->connector->excuteQuery($sql , "iii" , [$team, $room_id, $user_no]);
+		
+		return 1;
+	}
+	
+	// ready 상태를 받아 변경해 줌.
+	public function updateReadyState($room_id, $user_no, $ready_status){
+		$sql = "update user set ready_status = ? where room_id = ? and user_no = ?";
+		$rs = $this->connector->excuteQuery($sql , "iii" , [$ready_status, $room_id, $user_no]);
+		
+		return 1;
+	}
 }
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
