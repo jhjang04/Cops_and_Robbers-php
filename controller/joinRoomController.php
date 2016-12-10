@@ -7,7 +7,7 @@
 		throw new Exception("no password or nick or room_id");
 	}
 	
-	$rs = serviceCall("joinRoom" , $room_id , $pwd , $nick);
+	$rs = serviceCall("joinRoom" , $room_id , $pwd , $nickname);
 
 	echo json_encode($rs);
 ?>

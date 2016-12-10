@@ -53,11 +53,11 @@ class mysqlDao {
 	}
 	
 	// 방 존재여부 검사 return false or true
-	public function isExistRoom($room_id){
-		$sql = "select * from room where room_id = ?";
-		$rs = $this->connector->excuteQuery($sql, "i", [$room_id]);
+	public function isExistRoom($room_id , $pwd){
+		$sql = "select * from room where room_id = ? and pwd = ?";
+		$rs = $this->connector->excuteQuery($sql, "is", [$room_id , $pwd]);
 		
-		return count($rs);
+		return count($rs) > 0;
 	}
 	
 	// 새로운 user에게 틈 번호를 부여 함.(더 적은 팀으로 자동 배치)
@@ -86,7 +86,6 @@ class mysqlDao {
 	public function getNewUserNo($room_id){
 		$sql = "select ifnull(max(user_no) , 0) + 1 as user_no from user where room_id = ?";
 		$rs = $this->connector->excuteQuery($sql , "i" , [$room_id]);
-		print_r($rs);
 		return $rs[0]['user_no'];
 	}
 	
@@ -103,15 +102,15 @@ class mysqlDao {
 	// 방의 상태 체크
 	public function getRoomState($room_id){
 		
-		$sql = "select ready_status from user where room_id= ? and user_no = 1";
+		$sql = "select 1 from user where room_id= ? and ready_status = 2";
 		$rs = $this->connector->excuteQuery($sql , "i" , [$room_id]);
 		
-		$value= $rs[0]['ready_status'];
+		$value= count($rs);
 		
-		if($value==2){
+		if($value > 0){
 			$state = "WAIT";
 		}
-		else if($value==1){
+		else {
 			$state = "START";
 		}
 		
@@ -128,12 +127,15 @@ class mysqlDao {
 		return $rs;
 	}
 	
+	public function refreshUserLastAccess($room_id , $user_no) {
+		$sql = "update user set last_access = sysdate() where room_id = ? and user_no = ?";
+		$rs = $this->connector->excuteQuery($sql , "ii" , [$room_id, $user_no]);
+	}
+	
 	// team 번호를 받아 team을 변경해 줌.
 	public function updateTeam($room_id, $user_no, $team){
 		$sql = "update user set team = ? where room_id = ? and user_no = ?";
 		$rs = $this->connector->excuteQuery($sql , "iii" , [$team, $room_id, $user_no]);
-		
-		return 1;
 	}
 	
 	// ready 상태를 받아 변경해 줌.

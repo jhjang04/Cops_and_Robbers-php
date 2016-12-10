@@ -13,7 +13,6 @@ require "service/service.php";
 
 date_default_timezone_set('Asia/Seoul');
 
-$G_DOMAIN = "http://localhost/car/";
 $G_LOGGER = SimpleLogger::getLogger();
 $G_DBCONNECTOR;
 eval("\$G_DBCONNECTOR = new ".$db_info['type']."Connector(\$db_info);");

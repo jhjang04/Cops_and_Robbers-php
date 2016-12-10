@@ -49,7 +49,7 @@ class service{
 	public function joinRoom($room_id , $pwd , $nickname){
 		$rs = array();
 		// 방의 존재 여부 검사.
-		$room_exist = $this->m_dao->isExistRoom($room_id);
+		$room_exist = $this->m_dao->isExistRoom($room_id , $pwd);
 		
 		//방이 존재하지 않으면
 		if(!$room_exist){
@@ -58,9 +58,9 @@ class service{
 		}
 		
 		// 새로운 팀을 받아 옴.
+		$user_no = $this->m_dao->getNewUserNo($room_id);
 		$team = $this->m_dao->getNewTeam($room_id);
-		$this->m_dao->insertUser($room_id, 1, $nickname, $team);
-		$user_no = $this->m_dao->getNewUserNo($room_id);		
+		$this->m_dao->insertUser($room_id, $user_no, $nickname, $team);		
 		
 		$rs['result'] = 'PASS';
 		$rs['room_id'] = $room_id;
@@ -74,8 +74,9 @@ class service{
 		$rs = array();
 		
 		// 선택한 팀과 레디 상태를 업데이트 함.
-		$updaters = $this->m_dao->updateTeam($room_id, $user_no, $team);
-		$updaters2 = $this->m_dao->updateReadyState($room_id, $user_no,$ready_status);
+		$this->m_dao->refreshUserLastAccess($room_id, $user_no);
+		$this->m_dao->updateTeam($room_id, $user_no, $team);
+		$this->m_dao->updateReadyState($room_id, $user_no,$ready_status);
 
 		// 방의 진행 상태와 방에있는 유저의 리스트를 반환 함.
 		$isStart = $this->m_dao->getRoomState($room_id);
@@ -91,8 +92,9 @@ class service{
 		$rs = array();
 		
 		// update 할 것
-		$update_location = $this->m_dao->updateLocation($room_id, $user_no, $latitude, $longitude);
-		$update_state = $this->m_dao->updateState($room_id, $user_no, $state);
+		$this->m_dao->refreshUserLastAccess($room_id, $user_no);
+		$this->m_dao->updateLocation($room_id, $user_no, $latitude, $longitude);
+		$this->m_dao->updateState($room_id, $user_no, $state);
 		
 		// response
 		$user_list = $this->m_dao->getUserList($room_id);
@@ -165,6 +167,8 @@ function serviceCall(){
 		$strCallService.= "\$args[".$i."]";
 	}
 	$strCallService.= ");";
+	$logger->debug("call ".$strCallService);
+	$logger->debug("args = ".json_encode($args));
 	try{
 		eval ($strCallService);
 		$G_DBCONNECTOR->release("COMMIT");

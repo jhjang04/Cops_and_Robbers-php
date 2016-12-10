@@ -47,7 +47,7 @@ class SimpleLogger{
 	
 	public function info($txt){
 		if($this->levelCheck("INFO"))
-			$this->m_buffer .= date("Y-m-d H:i:s")." info  :: ".$txt."\n";
+			$this->m_buffer .= date("Y-m-d H:i:s")."  info :: ".$txt."\n";
 	}
 	
 	public function debug($txt){

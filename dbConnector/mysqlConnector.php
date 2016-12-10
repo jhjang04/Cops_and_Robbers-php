@@ -9,6 +9,8 @@ class mysqlConnector {
 
 	private $m_conn = null;
 	
+	private $mLogger = null;
+	
 	public function __construct($db_info) {
 		$this->set($db_info['host'] 
 			, $db_info['port'] 
@@ -16,6 +18,7 @@ class mysqlConnector {
 			, $db_info['pwd'] 
 			, $db_info['db_name']
 		);
+		$this->mLogger = SimpleLogger::getLogger();
 	}
 	
 // 	public function __construct($_host , $_port , $_user , $_pwd , $_db_name) {
@@ -56,6 +59,13 @@ class mysqlConnector {
 		if(!isset($params)){ $params = array();}
 		if(!is_array($params)){ $params = [$params]; }
 		
+		
+		$this->mLogger->info("call dao : ".debug_backtrace()[1]['function']);
+		
+		$this->mLogger->debug("excuqte Query :: $sql");
+		$this->mLogger->debug("params :: ".json_encode($params));
+		$this->mLogger->debug("types :: ".$types);
+		
 		$conn = $this->getConnection();
 		$stmt = mysqli_prepare($conn, $sql);
 		$strBindCode = "mysqli_stmt_bind_param(\$stmt , \"".$types."\"";
@@ -67,6 +77,9 @@ class mysqlConnector {
 		
 		mysqli_stmt_execute($stmt);
 		$result = mysqli_stmt_get_result($stmt);
+		if(is_bool($result)){
+			return $result;
+		}
 		$rs = array();
 		$idx = 0;
 		while ($row = mysqli_fetch_assoc($result)){
