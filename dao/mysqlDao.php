@@ -120,7 +120,7 @@ class mysqlDao {
 	// 해당 room_id에 속한 유저들의 리스트를 반환
 	public function getUserList($room_id){
 		$sql = "select user_no, nickname, team, state, latitude, longitude
-				team_select_time, ready_status, last_access from user 
+				, team_select_time, ready_status, last_access from user 
 				where room_id = ?";
 		$rs = $this->connector->excuteQuery($sql , "i" , [$room_id]);
 		
@@ -130,26 +130,27 @@ class mysqlDao {
 	public function refreshUserLastAccess($room_id , $user_no) {
 		$sql = "update user set last_access = sysdate() where room_id = ? and user_no = ?";
 		$rs = $this->connector->excuteQuery($sql , "ii" , [$room_id, $user_no]);
+		return $rs;
 	}
 	
 	// team 번호를 받아 team을 변경해 줌.
 	public function updateTeam($room_id, $user_no, $team){
 		$sql = "update user set team = ? where room_id = ? and user_no = ?";
 		$rs = $this->connector->excuteQuery($sql , "iii" , [$team, $room_id, $user_no]);
+		return $rs;
 	}
 	
 	// ready 상태를 받아 변경해 줌.
 	public function updateReadyState($room_id, $user_no, $ready_status){
 		$sql = "update user set ready_status = ? where room_id = ? and user_no = ?";
 		$rs = $this->connector->excuteQuery($sql , "iii" , [$ready_status, $room_id, $user_no]);
-		
-		return 1;
+		return $rs;
 	}
 	
 	// 마지막 인덱스 후의 전체 채팅 리스트
 	public function getChatList($room_id, $lastChatIdx){
 		$sql = "select room_id, team, chat_flag, idx, user_no, nickname, wr_time, text from chat
-				where room_id = ? and chat_flag = 3 and idx > ?";
+				where room_id = ? and chat_flag = 0 and idx > ?";
 		$rs = $this->connector->excuteQuery($sql , "ii" , [$room_id, $lastChatIdx]);
 		
 		return $rs;
@@ -165,69 +166,46 @@ class mysqlDao {
 	}
 	
 	// 마지막 전채채팅 인덱스를 받아오는 함수.
-	public function getLastChatIdx($room_id, $lastChatIdx){
-		$sql = "select max(idx) from chat where room_id= ? and chat_flag =3 and idx > ?";
-		$rs = $this->connector->excuteQuery($sql, "ii", [$room_id, $lastChatIdx]);
+	public function getLastChatIdx($room_id){
+		$sql = "select ifnull(max(idx),0) as idx from chat where room_id= ? and chat_flag = 0";
+		$rs = $this->connector->excuteQuery($sql, "i", [$room_id]);
 		
-		return $rs;
+		return $rs[0]['idx'];
 	}
 	
 	// 마지막 팀채팅 인덱스를 받아오는 함수.
-	public function getLastTeamChatIdx($room_id,$team,$lastTeamChatIdx){
-		$sql = "select max(idx) from chat where room_id= ? and chat_flag = ? and idx > ?";
-		$rs = $this->connector->excuteQuery($sql, "iii", [$room_id, $team, $lastTeamChatIdx]);
+	public function getLastTeamChatIdx($room_id,$team){
+		$sql = "select ifnull(max(idx),0) as idx from chat where room_id= ? and chat_flag = ?";
+		$rs = $this->connector->excuteQuery($sql, "ii", [$room_id, $team]);
 		
-		return $rs;
+		return $rs[0]['idx'];
 	}
 	
 	public function updateLocation($room_id, $user_no, $latitude, $longitude){
 		$sql = "update user set latitude = ?, longitude = ? , last_access = sysdate()
 				where room_id = ? and user_no = ?";
 		$rs = $this->connector->excuteQuery($sql , "ddii" , [$latitude,$longitude,$room_id, $user_no]);
-		
-		return 1;
+		return $rs;
 	}
 	
 	public function updateState($room_id, $user_no, $state){
 		$sql = "update user set state = ? , last_access = sysdate(),
 				where room_id = ? and user_no = ?";
 		$rs = $this->connector->excuteQuery($sql , "iii" , [$state, $room_id, $user_no]);
-	
-		return 1;
+		return $rs;
 	}
 	
 	// 채팅을 마지막 idx로 찾아서 넣음.
 	public function insertChat($room_id, $team, $chat_flag, $user_no, $nickname, $text){
-		$sql = "select max(idx) from chat where room_id = ? and chat_flag = ?";
-		$maxIdx = $this->connector->excuteQuery($sql, "ii", [$room_id, $chat_flag]);
+		$sql = "select ifnull(max(idx) , 0) + 1 as idx from chat where room_id = ? and chat_flag = ? ";
+		$nextIdx = $this->connector->excuteQuery($sql, "ii", [$room_id, $chat_flag])[0]['idx'];
 		
 		$sql = "insert into chat(room_id, team, chat_flag, idx, user_no, nickname, wr_time, text)
 				values( ?, ?, ?, ?, ?, ?, sysdate(), ?)";
 		
-		$rs = $this->connector->excuteQuery($sql, "iiiiiss",[$room_id, $team, $chat_flag, $maxIdx,
+		$rs = $this->connector->excuteQuery($sql, "iiiiiss",[$room_id, $team, $chat_flag, $nextIdx,
 				$user_no, $nickname, $text]);
-		
 		return $rs;
 	}
 }
 ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

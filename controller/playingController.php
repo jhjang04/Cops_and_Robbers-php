@@ -5,7 +5,7 @@
 	$latitude = $_GET['latitude'];
 	$longitude = $_GET['longitude'];
 	$state = $_GET['state'];
-	$lastChatIdx = $_GET['lastchatIdx'];
+	$lastChatIdx = $_GET['lastChatIdx'];
 	$lastTeamChatIdx = $_GET['lastTeamChatIdx'];
 
 	if(!isset($room_id) || !isset($user_no) || !isset($latitude) || !isset($longitude) || !isset($state)

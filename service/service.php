@@ -100,8 +100,8 @@ class service{
 		$user_list = $this->m_dao->getUserList($room_id);
 		$chat_list = $this->m_dao->getChatList($room_id, $lastChatIdx);
 		$teamchat_list = $this->m_dao->getTeamChatList($room_id, $team, $lastTeamChatIdx);
-		$lastIdx = $this->m_dao->getLastChatIdx($room_id, $lastChatIdx);
-		$lastTeamIdx = $this->m_dao->getLastTeamChatList($room_id,$team,$lastTeamChatIdx);
+		$lastIdx = $this->m_dao->getLastChatIdx($room_id);
+		$lastTeamIdx = $this->m_dao->getLastTeamChatIdx($room_id,$team,$lastTeamChatIdx);
 
 		$rs['result'] = "ING";
 		$rs['userList'] = $user_list;
@@ -122,8 +122,8 @@ class service{
 		$this->m_dao->insertChat($room_id, $team, $chat_flag, $user_no, $nickname, $text);
 		
 		// response
-		$lastIdx = $this->m_dao->getLastChatIdx($room_id, $lastChatIdx);
-		$lastTeamIdx = $this->m_dao->getLastTeamChatList($room_id,$team,$lastTeamChatIdx);
+		$lastIdx = $this->m_dao->getLastChatIdx($room_id);
+		$lastTeamIdx = $this->m_dao->getLastTeamChatIdx($room_id,$team,$lastTeamChatIdx);
 		$chat_list = $this->m_dao->getChatList($room_id, $lastChatIdx);
 		$teamchat_list = $this->m_dao->getTeamChatList($room_id, $team, $lastTeamChatIdx);
 		
@@ -134,14 +134,6 @@ class service{
 		
 		return $rs;
 	}
-	
-	public function exitRoom($room_id , $user_id){
-		
-	}
-	
-	//public function atTeamSelect();
-	
-	//public function atPlaying();
 }
 
 
