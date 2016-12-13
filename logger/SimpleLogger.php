@@ -59,9 +59,11 @@ class SimpleLogger{
 	public function flush(){
 		$fileNm = $this->m_file;
 		$file = fopen($fileNm, "a");
-		fwrite( $file, $this->m_buffer );
-		$this->m_buffer = "";
-		fclose( $file );
+		if($file){
+			fwrite( $file, $this->m_buffer );
+			$this->m_buffer = "";
+			fclose( $file );
+		}
 	}
 }
 ?>

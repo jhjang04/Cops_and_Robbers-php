@@ -78,6 +78,7 @@ class mysqlConnector {
 		mysqli_stmt_execute($stmt);
 		$result = mysqli_stmt_get_result($stmt);
 		if(is_bool($result)){
+			mysqli_stmt_close($stmt);
 			return $result;
 		}
 		$rs = array();

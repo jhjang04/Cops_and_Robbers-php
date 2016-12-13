@@ -54,7 +54,7 @@ class mysqlDao {
 	
 	// 방 존재여부 검사 return false or true
 	public function isExistRoom($room_id , $pwd){
-		$sql = "select * from room where room_id = ? and pwd = ?";
+		$sql = "select 1 from room where room_id = ? and pwd = ?";
 		$rs = $this->connector->excuteQuery($sql, "is", [$room_id , $pwd]);
 		
 		return count($rs) > 0;
@@ -117,6 +117,19 @@ class mysqlDao {
 		return $state;
 	}
 	
+	
+	public function setStart($room_id){
+		$sql = "update room set start_time = ifnull(start_time , date_add(sysdate() , interval 3 second)) where room_id = ?";
+		$rs = $this->connector->excuteQuery($sql , "i" , [$room_id]);
+	}
+	
+	public function getStartTime($room_id){
+		$sql = "select start_time from room where room_id = ?";
+		$rs = $this->connector->excuteQuery($sql , "i" , [$room_id]);
+		return $rs[0]['start_time'];
+	}
+	
+	
 	// 해당 room_id에 속한 유저들의 리스트를 반환
 	public function getUserList($room_id){
 		$sql = "select user_no, nickname, team, state, latitude, longitude
@@ -160,7 +173,7 @@ class mysqlDao {
 	public function getTeamChatList($room_id, $team, $lastTeamChatIdx){
 		$sql = "select room_id, team, chat_flag, idx, user_no, nickname, wr_time, text from chat
 				where room_id = ? and chat_flag = ? and idx > ?";
-		$rs = $this->connector->excuteQuery($sql , "iii" , [$room_id, $team, $lastChatIdx]);
+		$rs = $this->connector->excuteQuery($sql , "iii" , [$room_id, $team, $lastTeamChatIdx]);
 	
 		return $rs;
 	}
@@ -189,10 +202,30 @@ class mysqlDao {
 	}
 	
 	public function updateState($room_id, $user_no, $state){
-		$sql = "update user set state = ? , last_access = sysdate(),
+		$sql = "update user set state = ?
 				where room_id = ? and user_no = ?";
 		$rs = $this->connector->excuteQuery($sql , "iii" , [$state, $room_id, $user_no]);
 		return $rs;
+	}
+	
+	public function getPlayingResult($room_id , $user_no){
+		$sql = "select case when alive_robbers = 0 then case when v.user_team = 1 then 'WIN' else 'LOSE' end 
+						when sysdate() > end_time then case when v.user_team = 2 then 'WIN' else 'LOSE' end 
+				        else 'ING'
+					end as result
+				from 
+				(
+				select r.* 
+					, date_add(start_time , interval 600 second) as end_time
+				    , (select count(1) from user where room_id = r.room_id and team = 2 and state = 1) as alive_robbers
+				    , usr.team user_team
+				from room r , user usr
+				where usr.room_id = r.room_id
+				and r.room_id = ?
+				and usr.user_no = ?
+				) V";
+		$rs = $this->connector->excuteQuery($sql , "ii" , [$room_id, $user_no]);
+		return $rs[0]['result'];
 	}
 	
 	// 채팅을 마지막 idx로 찾아서 넣음.

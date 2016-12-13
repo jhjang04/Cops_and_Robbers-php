@@ -81,9 +81,17 @@ class service{
 		// 방의 진행 상태와 방에있는 유저의 리스트를 반환 함.
 		$isStart = $this->m_dao->getRoomState($room_id);
 		$user_list = $this->m_dao->getUserList($room_id);
+		
+		$startTime = "";
+		if($isStart == "START"){
+			$this->m_dao->setStart($room_id);
+			$startTime = $this->m_dao->getStartTime($room_id);
+			
+		}
 
 		$rs['result'] = $isStart;
 		$rs['userList']= $user_list;
+		$rs['startTime'] = $startTime;
 		
 		return $rs;
 	}
@@ -102,8 +110,9 @@ class service{
 		$teamchat_list = $this->m_dao->getTeamChatList($room_id, $team, $lastTeamChatIdx);
 		$lastIdx = $this->m_dao->getLastChatIdx($room_id);
 		$lastTeamIdx = $this->m_dao->getLastTeamChatIdx($room_id,$team,$lastTeamChatIdx);
+		$result = $this->m_dao->getPlayingResult($room_id , $user_no);
 
-		$rs['result'] = "ING";
+		$rs['result'] = $result;
 		$rs['userList'] = $user_list;
 		$rs['chatList'] = $chat_list;
 		$rs['teamChatList'] = $teamchat_list;
